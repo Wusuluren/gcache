@@ -29,8 +29,8 @@ type valueItem struct {
 }
 
 type cacheMap struct {
-	data   map[int]valueItem
-	access map[int]int
+	data   map[KeyType]valueItem
+	access map[KeyType]int
 	lock   sync.Mutex
 }
 
@@ -68,7 +68,6 @@ func (c *cacheMap) MDel(key ...KeyType) {
 
 type Cache struct {
 	slotData           []cacheMap
-	hashFn             func(v KeyType) int64
 	cleanupInterval    time.Duration
 	maxSlotSize        int
 	reduceSlotSizeRate float64
@@ -84,7 +83,6 @@ func NewCache() Cache {
 	}
 	c := Cache{
 		slotData:           slotData,
-		hashFn:             _hashFn,
 		cleanupInterval:    _cleanupInterval,
 		maxSlotSize:        _maxSlotSize,
 		reduceSlotSizeRate: _reduceSlotSizeRate,
@@ -126,25 +124,25 @@ func (c *Cache) cleanup() {
 }
 
 func (c *Cache) Set(key KeyType, val ValueType, duration time.Duration) {
-	h := c.hashFn(key)
+	h := _hashFn(key)
 	c.slotData[h].Set(key, val, duration)
 }
 
 func (c *Cache) Get(key KeyType) (val ValueType, ok bool) {
-	h := c.hashFn(key)
+	h := _hashFn(key)
 	val, ok = c.slotData[h].Get(key)
 	return
 }
 
 func (c *Cache) Del(key KeyType) {
-	h := c.hashFn(key)
+	h := _hashFn(key)
 	c.slotData[h].Del(key)
 }
 
 func (c *Cache) MDel(key ...KeyType) {
-	slotKeyMap := map[int64][]KeyType{}
+	slotKeyMap := map[int][]KeyType{}
 	for _, k := range key {
-		h := c.hashFn(k)
+		h := _hashFn(k)
 		if _, ok := slotKeyMap[h]; ok {
 			slotKeyMap[h] = append(slotKeyMap[h], k)
 		} else {
