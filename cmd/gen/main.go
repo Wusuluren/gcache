@@ -24,7 +24,7 @@ func main() {
 	srcBlob, err := ioutil.ReadFile("cache.g")
 	ckerr(err)
 
-	suffix := fmt.Sprintf("%s%s", trimLetterStr(upperFirstLetter(*KeyType)), trimLetterStr(upperFirstLetter(*ValueType)))
+	suffix := trimLetterStr(fmt.Sprintf("%s%s", trimLetterStr(CamelString(*KeyType)), trimLetterStr(CamelString(*ValueType))))
 
 	dstBlob := srcBlob
 	dstBlob = bytes.Replace(dstBlob, []byte("KeyType"), []byte(*KeyType), -1)
@@ -66,20 +66,38 @@ func trimLetterStr(s string) string {
 			dst = append(dst, src[i])
 		} else if src[i] == '*' {
 			dst = append(dst, 'P')
+		} else if src[i] == '[' {
+			dst = append(dst, 'S')
+		} else if src[i] == '{' {
+			dst = append(dst, 'M')
 		}
 	}
 	return string(dst)
 }
 
-func upperFirstLetter(s string) string {
-	if len(s) == 0 {
-		return s
+// camel string, xx_yy to XxYy
+func CamelString(s string) string {
+	data := make([]byte, 0, len(s))
+	j := false
+	k := false
+	num := len(s) - 1
+	for i := 0; i <= num; i++ {
+		d := s[i]
+		if k == false && d >= 'A' && d <= 'Z' {
+			k = true
+		}
+		if d >= 'a' && d <= 'z' && (j || k == false) {
+			d = d - 32
+			j = false
+			k = true
+		}
+		if k && d == '_' && num > i && s[i+1] >= 'a' && s[i+1] <= 'z' {
+			j = true
+			continue
+		}
+		data = append(data, d)
 	}
-	b := []byte(s)
-	if b[0] >= 'a' && b[0] <= 'z' {
-		b[0] -= 'a' - 'A'
-	}
-	return string(b)
+	return string(data[:])
 }
 
 func ckerr(err error) {
