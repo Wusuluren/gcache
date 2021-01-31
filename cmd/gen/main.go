@@ -34,8 +34,10 @@ func main() {
 	dstBlob = bytes.Replace(dstBlob, []byte("_maxSlotSize"), []byte(*maxSlotSize), -1)
 	dstBlob = bytes.Replace(dstBlob, []byte("_reduceSlotSizeRate"), []byte(*reduceSlotSizeRate), -1)
 
-	dstBlob = reRepl(dstBlob, `ValueItem[\W]+`, "ValueItem", "ValueItem"+suffix)
-	dstBlob = reRepl(dstBlob, `CacheMap[\W]+`, "CacheMap", "CacheMap"+suffix)
+	dstBlob = reRepl(dstBlob, `valueItem[\W]+`, "valueItem", "valueItem"+suffix)
+	dstBlob = reRepl(dstBlob, `valueItemSort[\W]+`, "valueItemSort", "valueItemSort"+suffix)
+	dstBlob = reRepl(dstBlob, `valueItemsSort[\W]+`, "valueItemsSort", "valueItemsSort"+suffix)
+	dstBlob = reRepl(dstBlob, `cacheMap[\W]+`, "cacheMap", "cacheMap"+suffix)
 	dstBlob = reRepl(dstBlob, `Cache[\W]+`, "Cache", "Cache"+suffix)
 	dstBlob = reRepl(dstBlob, `NewCache[\W]+`, "NewCache", "NewCache"+suffix)
 
