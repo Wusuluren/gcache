@@ -50,7 +50,7 @@ func (c *cacheMapIntInt) Set(key int, val int, duration time.Duration) {
 		Value:    val,
 		ExpireAt: time.Now().Add(duration),
 	}
-	c.access[key]=1
+	c.access[key] = 1
 	c.lock.Unlock()
 }
 
@@ -87,14 +87,15 @@ func NewCacheIntInt() CacheIntInt {
 	slotData := make([]cacheMapIntInt, defaultSlotNum)
 	for i := range slotData {
 		slotData[i] = cacheMapIntInt{
-			data: make(map[int]valueItemIntInt),
-			lock: sync.Mutex{},
+			data:   make(map[int]valueItemIntInt),
+			access: make(map[int]int),
+			lock:   sync.Mutex{},
 		}
 	}
 	c := CacheIntInt{
 		slotData:           slotData,
 		cleanupInterval:    10 * time.Minute,
-		maxSlotSize:        1024*1024,
+		maxSlotSize:        1024 * 1024,
 		reduceSlotSizeRate: 0.75,
 	}
 	go c.cleanup()

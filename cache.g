@@ -77,8 +77,9 @@ func NewCache() Cache {
 	slotData := make([]cacheMap, defaultSlotNum)
 	for i := range slotData {
 		slotData[i] = cacheMap{
-			data: make(map[KeyType]valueItem),
-			lock: sync.Mutex{},
+			data:   make(map[KeyType]valueItem),
+			access: make(map[int]int),
+			lock:   sync.Mutex{},
 		}
 	}
 	c := Cache{
